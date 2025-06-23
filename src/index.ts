@@ -1,19 +1,29 @@
-interface TotalInterface {
-    price: number,
-    discount: number, 
-    isInstallment: boolean, 
-    months: number
+import { posts } from "./constants.js";
+interface Posts {
+  id: string;
+  title: string;
+  body: string;
 }
-const totalPrice = (product: TotalInterface): number => {
-    const { price, discount, isInstallment, months } = product;
-    const discountPrice = (price * discount) / 100;
 
-    if(isInstallment) {
-        return (price - discountPrice) / months
-    }
-    return (price - discountPrice)
-    
+interface Result {
+  byId: { [key: string]: Posts };
+  allIds: string[];
+}
+
+const normalizeData = (unnormalizedData: Posts[]): Result => {
+  const result = unnormalizedData.reduce(
+    (acc: Result, cur: Posts) => {
+      acc = {
+        byId: { ...acc.byId, [cur.id]: cur },
+        allIds: [...acc.allIds, cur.id],
+      };
+
+      return acc;
+    },
+    { byId: {}, allIds: [] }
+  );
+
+  return result;
 };
 
-const price = totalPrice({ price: 100000, discount: 25, isInstallment: true, months: 12 });
-console.log(price); // 6250
+console.log(normalizeData(posts));
